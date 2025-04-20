@@ -407,7 +407,11 @@
         let expense = 0;
         let hasData = false;
 
-        transactions.reverse().forEach((t, idx) => {
+        let sortedTransactions = [...transactions].sort((a, b) => {
+          return new Date(b.date) - new Date(a.date);
+        });
+
+        sortedTransactions.forEach((t, idx) => {
           const date = new Date(t.date);
           if (
             (search && !t.description.toLowerCase().includes(search)) ||
