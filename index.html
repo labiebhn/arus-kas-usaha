@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arus Kas Usaha</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f9f9f9;
+        --card: #ffffff;
+        --accent: #4f46e5;
+        --text: #111827;
+        --text-light: #6b7280;
+        --danger: #ef4444;
+        --success: #10b981;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        max-width: 800px;
+        margin: auto;
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 16px;
+        text-align: center;
+      }
+
+      .card {
+        background: var(--card);
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        margin-bottom: 15px;
+      }
+
+      input,
+      button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 8px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        font-size: 0.9rem;
+      }
+
+      button {
+        background: var(--accent);
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      button:hover {
+        background: #4338ca;
+        color: white;
+      }
+
+      .btn-delete,
+      .btn-clear {
+        background: var(--danger);
+        padding: 6px 12px;
+        font-size: 0.85rem;
+      }
+
+      .btn-delete {
+        width: 80px;
+        margin-left: 8px;
+      }
+
+      .btn-export {
+        background: var(--success);
+        margin-top: 10px;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin-top: 10px;
+      }
+
+      li {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 0.9rem;
+        align-items: flex-start;
+      }
+
+      li span {
+        width: 100%;
+        margin-bottom: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      li span:last-child {
+        margin-bottom: 0;
+      }
+
+      small {
+        color: var(--text-light);
+        display: block;
+        font-size: 0.75rem;
+      }
+
+      .highlight {
+        font-weight: 600;
+        color: var(--accent);
+      }
+
+      .type-toggle {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .toggle {
+        flex: 1;
+        background: #e5e7eb;
+        color: #374151;
+        border: none;
+        padding: 8px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s ease;
+        font-size: 0.85rem;
+        text-align: center;
+      }
+
+      .toggle.active {
+        background: var(--accent);
+        color: white;
+      }
+
+      .filters {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .filters input[type="date"],
+      .filters input[type="text"],
+      .filters button {
+        width: 100%;
+      }
+
+      .no-data {
+        text-align: center;
+        color: var(--text-light);
+        font-size: 0.8rem;
+        margin-top: 10px;
+      }
+
+      #myChart {
+        max-width: 100%;
+        margin: 15px auto;
+      }
+
+      /* Wide screen */
+      @media (min-width: 600px) {
+        h1 {
+          font-size: 2rem;
+        }
+
+        .card {
+          padding: 20px;
+          margin-bottom: 20px;
+        }
+
+        input,
+        button {
+          padding: 12px;
+          margin-top: 10px;
+          font-size: 1rem;
+        }
+
+        .btn-delete,
+        .btn-clear {
+          padding: 4px 10px;
+          font-size: 0.8rem;
+        }
+
+        .btn-delete {
+          margin-left: 10px;
+        }
+
+        li {
+          flex-direction: row;
+          align-items: center;
+          font-size: 0.95rem;
+        }
+
+        li span {
+          width: auto;
+          margin-bottom: 0;
+          justify-content: space-between;
+        }
+
+        .filters {
+          flex-direction: row;
+        }
+
+        .filters input[type="date"],
+        .filters input[type="text"] {
+          flex-grow: 1;
+          width: auto;
+        }
+
+        .filters button {
+          width: auto;
+        }
+
+        .type-toggle {
+          gap: 10px;
+        }
+
+        .toggle {
+          padding: 10px;
+          font-size: 1rem;
+        }
+
+        #myChart {
+          max-width: 400px;
+          margin: 20px auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📒 Arus Kas Usaha</h1>
+
+    <div class="card">
+      <div class="type-toggle">
+        <button
+          type="button"
+          id="btn-income"
+          class="toggle active"
+          onclick="selectType('income')"
+        >
+          💰 Pemasukan
+        </button>
+        <button
+          type="button"
+          id="btn-expense"
+          class="toggle"
+          onclick="selectType('expense')"
+        >
+          📄 Pengeluaran
+        </button>
+      </div>
+      <input type="text" id="description" placeholder="Deskripsi" />
+      <input type="number" id="amount" placeholder="Jumlah (Rp)" />
+      <input type="datetime-local" id="datetime" />
+      <button onclick="addTransaction()">Tambah Transaksi</button>
+      <p style="color: var(--danger)">*Semua data disimpan di browser</p>
+    </div>
+
+    <div class="card">
+      <div class="filters">
+        <input type="date" id="filter-start" oninput="render()" />
+        <input type="date" id="filter-end" oninput="render()" />
+        <input
+          type="text"
+          id="search"
+          placeholder="Cari deskripsi..."
+          oninput="render()"
+        />
+        <button onclick="resetFilters()">🔄 Reset Filter</button>
+      </div>
+      <p>Kas Masuk: <span class="highlight" id="total-income">Rp 0</span></p>
+      <p>Kas Keluar: <span class="highlight" id="total-expense">Rp 0</span></p>
+      <p>Profit: <span class="highlight" id="balance">Rp 0</span></p>
+      <button class="btn-export" onclick="exportToExcel()">
+        📅 Ekspor ke Excel
+      </button>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-bottom: 8px; font-size: 1.1rem">📄 Daftar Transaksi</h2>
+      <ul id="transaction-list"></ul>
+      <p id="no-data" class="no-data" style="display: none">
+        Belum ada transaksi untuk ditampilkan.
+      </p>
+      <button class="btn-clear" onclick="clearAll()">🗑️ Hapus Semua</button>
+    </div>
+
+    <div class="card">
+      <canvas id="myChart"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+      let transactions = JSON.parse(localStorage.getItem("cashflow") || "[]");
+      let selectedType = "income";
+
+      function save() {
+        localStorage.setItem("cashflow", JSON.stringify(transactions));
+      }
+
+      function formatDate(dateStr) {
+        const d = new Date(dateStr);
+        const day = String(d.getDate()).padStart(2, "0");
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const year = d.getFullYear();
+        const hours = String(d.getHours()).padStart(2, "0");
+        const minutes = String(d.getMinutes()).padStart(2, "0");
+        const seconds = String(d.getSeconds()).padStart(2, "0");
+        return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+      }
+
+      function selectType(type) {
+        selectedType = type;
+        document
+          .getElementById("btn-income")
+          .classList.toggle("active", type === "income");
+        document
+          .getElementById("btn-expense")
+          .classList.toggle("active", type === "expense");
+      }
+
+      function addTransaction() {
+        const description = document.getElementById("description").value;
+        const amount = parseFloat(document.getElementById("amount").value);
+        const datetime =
+          document.getElementById("datetime").value || new Date().toISOString();
+
+        if (!description || isNaN(amount)) return alert("Isi semua kolom!");
+
+        transactions.push({
+          type: selectedType,
+          description,
+          amount,
+          date: datetime,
+        });
+        save();
+        document.getElementById("description").value = "";
+        document.getElementById("amount").value = "";
+        document.getElementById("datetime").value = "";
+        render();
+      }
+
+      function deleteTransaction(index) {
+        if (confirm("Hapus transaksi ini?")) {
+          transactions.splice(index, 1);
+          save();
+          render();
+        }
+      }
+
+      function clearAll() {
+        if (confirm("Yakin ingin menghapus semua transaksi?")) {
+          transactions = [];
+          save();
+          render();
+        }
+      }
+
+      function resetFilters() {
+        document.getElementById("filter-start").value = "";
+        document.getElementById("filter-end").value = "";
+        document.getElementById("search").value = "";
+        render();
+      }
+
+      function render() {
+        const list = document.getElementById("transaction-list");
+        const noDataText = document.getElementById("no-data");
+        const search = document.getElementById("search").value.toLowerCase();
+
+        const startInput = document.getElementById("filter-start").value;
+        const endInput = document.getElementById("filter-end").value;
+
+        const start = startInput ? new Date(startInput) : null;
+        if (start) {
+          start.setHours(0, 0, 0, 0);
+        }
+
+        const end = endInput ? new Date(endInput) : null;
+        if (end) {
+          end.setHours(23, 59, 59, 999);
+        }
+
+        list.innerHTML = "";
+
+        let income = 0;
+        let expense = 0;
+        let hasData = false;
+
+        transactions.reverse().forEach((t, idx) => {
+          const date = new Date(t.date);
+          if (
+            (search && !t.description.toLowerCase().includes(search)) ||
+            (start && date < start) ||
+            (end && date > end)
+          )
+            return;
+
+          hasData = true;
+
+          const li = document.createElement("li");
+          li.innerHTML = `
+                    <div>
+                        <p>${t.description} (${
+            t.type === "income" ? "+" : "-"
+          })</p>
+                        <small>${formatDate(t.date)}</small>
+                    </div>
+                    <span>
+                        Rp ${t.amount.toLocaleString()}
+                        <button class="btn-delete" onclick="deleteTransaction(${idx})">Hapus</button>
+                    </span>
+                `;
+          list.appendChild(li);
+
+          if (t.type === "income") income += t.amount;
+          else expense += t.amount;
+        });
+
+        noDataText.style.display = hasData ? "none" : "block";
+
+        document.getElementById(
+          "total-income"
+        ).innerText = `Rp ${income.toLocaleString()}`;
+        document.getElementById(
+          "total-expense"
+        ).innerText = `Rp ${expense.toLocaleString()}`;
+        document.getElementById("balance").innerText = `Rp ${(
+          income - expense
+        ).toLocaleString()}`;
+
+        updateChart(income, expense);
+      }
+
+      function updateChart(income, expense) {
+        if (income === 0 && expense === 0) {
+          document.getElementById("myChart").style.display = "none";
+          return;
+        }
+
+        const ctx = document.getElementById("myChart").getContext("2d");
+        const chartData = {
+          labels: ["Kas Masuk", "Kas Keluar"],
+          datasets: [
+            {
+              data: [income, expense],
+              backgroundColor: ["#10b981", "#ef4444"],
+              hoverBackgroundColor: ["#14b8a6", "#f87171"],
+            },
+          ],
+        };
+
+        if (window.myPieChart) {
+          window.myPieChart.destroy();
+        }
+
+        window.myPieChart = new Chart(ctx, {
+          type: "pie",
+          data: chartData,
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: "top",
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (tooltipItem) {
+                    return `${
+                      tooltipItem.label
+                    }: Rp ${tooltipItem.raw.toLocaleString()}`;
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      function exportToExcel() {
+        const formattedTransactions = transactions.map((t, index) => ({
+          Nomor: index + 1,
+          Tanggal: formatDate(t.date),
+          Deskripsi: t.description,
+          Debit: t.type === "income" ? t.amount : "",
+          Kredit: t.type === "expense" ? t.amount : "",
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(formattedTransactions);
+
+        // Menambahkan baris total
+        const totalDebit = transactions.reduce(
+          (sum, t) => (t.type === "income" ? sum + t.amount : sum),
+          0
+        );
+        const totalKredit = transactions.reduce(
+          (sum, t) => (t.type === "expense" ? sum + t.amount : sum),
+          0
+        );
+
+        XLSX.utils.sheet_add_json(
+          ws,
+          [
+            {
+              Nomor: "",
+              Tanggal: "",
+              Deskripsi: "Total",
+              Debit: totalDebit,
+              Kredit: totalKredit,
+            },
+          ],
+          {
+            header: ["Nomor", "Tanggal", "Deskripsi", "Debit", "Kredit"],
+            skipHeader: true,
+            origin: formattedTransactions.length + 1,
+          }
+        );
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Transaksi");
+        XLSX.writeFile(wb, "transaksi.xlsx");
+      }
+
+      window.onload = render;
+    </script>
+  </body>
+</html>
