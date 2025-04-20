@@ -27,7 +27,7 @@
 ## 🚀 Live Demo
 
 Try it instantly:
-🔗 [https://labiebhn.github.io/arus-kas-usaha]([https://labiebhn.github.io/arus-kas-usaha](arus-kas-usaha))
+🔗 [https://labiebhn.github.io/arus-kas-usaha](https://labiebhn.github.io/arus-kas-usaha)
 
 ## 🔧 Getting Started
 
